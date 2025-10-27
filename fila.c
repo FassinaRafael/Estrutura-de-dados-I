@@ -9,9 +9,9 @@ Code, Compile, Run and Debug online from anywhere in world.
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct elemento{
+typedef struct Elemento{
     int conteudo;
-    struct elemento* prox;
+    struct Elemento* prox;
 }Elemento;
 
 typedef struct Fila{
@@ -53,11 +53,66 @@ int enqueue(Fila* fi, int x){
         fi->fim = no;
     }
     fi->quantidade++;
+    return 1;
+}
+
+int dequeue(Fila* fi){
+    if (fi == NULL || fi->inicio == NULL){
+        return 0;
+    }
+    
+    Elemento* no = fi->inicio;
+    fi->inicio = fi->inicio->prox;
+    
+    if(fi->inicio == NULL){
+        fi->fim = NULL;
+    }
+    
+    free(no);
+    fi->quantidade--;
+    return 1;
+}
+
+void imprime_fila(Fila* fi){
+    if (fi == NULL || fi->inicio == NULL){
+        printf("Fila vazia!\n");
+        return;
+    }
+
+    Elemento* atual = fi->inicio;
+    printf("Fila: ");
+    while (atual != NULL){
+        printf("%d ", atual->conteudo);
+        atual = atual->prox;
+    }
+    printf("\n");
+}
+
+int peek(Fila* fi, int* valor){
+    if(fi == NULL || fi->inicio == NULL){
+        return 0;
+    }
+    *valor = fi->inicio->conteudo;
+    return 1;
 }
 
 int main()
 {
-    printf("Hello World");
+    int x;
+    Fila* fi = cria_fila();
+    enqueue(fi, 10);
+    enqueue(fi, 20);
+    enqueue(fi, 30);
+    imprime_fila(fi);
+    dequeue(fi);
+    imprime_fila(fi);
+    
+    if (peek(fi, &x)) {
+        printf("Primeiro elemento da fila: %d\n", x);
+    } else {
+        printf("Fila vazia!\n");
+    }
+
 
     return 0;
 }
