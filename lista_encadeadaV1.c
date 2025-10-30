@@ -187,6 +187,67 @@ void buscar_maior_na_lista(Lista* lista){
     printf("Posicao (indice): %d\n", posicao_maior);
 }
 
+int esta_contida(Lista l1, Lista l2){
+    if(l2 == NULL)
+        return 1;
+        
+    if(l1 == NULL)
+        return 0;
+    
+    Lista aux_l2 = l2;
+    
+    while(aux_l2 != NULL){
+        
+        Lista aux_l1 = l1;
+        int encontrou = 0;
+        
+        while(aux_l1 != NULL){
+            if(aux_l1->conteudo == aux_l2->conteudo){
+                encontrou = 1;
+                break;
+            }
+            aux_l1 = aux_l1->proximo;
+        }
+        
+        if(encontrou == 0)
+            return 0;
+        
+        aux_l2 = aux_l2->proximo;
+    }
+    return 1;
+}
+
+void copiar_sem_duplicados(Lista l1, Lista* l2){
+    if(l1 == NULL)
+        return;
+    
+    if(l2 == NULL)
+        return;
+    
+    Lista aux_l1 = l1;
+    while(aux_l1 != NULL) {
+        
+        Lista aux_l2 = *l2;
+        int e_igual = 0;
+        
+        while(aux_l2 != NULL) {
+            
+            if (aux_l2->conteudo == aux_l1->conteudo){
+                e_igual = 1;
+                break;
+            }
+            aux_l2 = aux_l2->proximo;
+        }
+        
+        if(e_igual == 0){
+            insere_lista_fim(l2, aux_l1->conteudo);
+        }
+        
+        aux_l1 = aux_l1->proximo;
+    }
+}
+
+//MAIN 
 int main(void) {
     printf("--- Teste 1: Criacao e Insercao ---\n");
     Lista* lst1 = cria_lista();
@@ -271,6 +332,69 @@ int main(void) {
     
     free_lista(lst2); // Agora é seguro, pois *lst2 é NULL
     printf("Lista 2 liberada.\n");
+    
+    printf("--- Teste 9: Lista Contida ---\n");
+    Lista* lst_grande = cria_lista();
+    insere_lista_fim(lst_grande, 10);
+    insere_lista_fim(lst_grande, 20);
+    insere_lista_fim(lst_grande, 30);
+    insere_lista_fim(lst_grande, 40);
+    insere_lista_fim(lst_grande, 50);
+
+    Lista* lst_sub_verdadeira_1 = cria_lista();
+    insere_lista_fim(lst_sub_verdadeira_1, 30);
+    insere_lista_fim(lst_sub_verdadeira_1, 40); // Contíguo, mas ok
+    
+    Lista* lst_sub_verdadeira_2 = cria_lista();
+    insere_lista_fim(lst_sub_verdadeira_2, 50);
+    insere_lista_fim(lst_sub_verdadeira_2, 30); // Ordem trocada
+    
+    Lista* lst_sub_falsa = cria_lista();
+    insere_lista_fim(lst_sub_falsa, 30);
+    insere_lista_fim(lst_sub_falsa, 99); // 99 não existe
+
+    printf("Lista Grande: "); imprime_lista(lst_grande);
+    printf("Sub-lista 1 (30, 40): "); imprime_lista(lst_sub_verdadeira_1);
+    printf("Sub-lista 2 (50, 30): "); imprime_lista(lst_sub_verdadeira_2);
+    printf("Sub-lista 3 (30, 99): "); imprime_lista(lst_sub_falsa);
+    printf("\n");
+
+    int res1 = esta_contida(*lst_grande, *lst_sub_verdadeira_1);
+    printf("Teste 1 (Verdadeiro): %s\n", res1 ? "SUCESSO" : "FALHOU");
+
+    int res2 = esta_contida(*lst_grande, *lst_sub_verdadeira_2);
+    printf("Teste 2 (Verdadeiro, ordem trocada): %s\n", res2 ? "SUCESSO" : "FALHOU");
+
+    int res3 = esta_contida(*lst_grande, *lst_sub_falsa);
+    printf("Teste 3 (Falso, 99 nao existe): %s\n", !res3 ? "SUCESSO" : "FALHOU");
+
+    // Limpeza
+    free_lista(lst_grande);
+    free_lista(lst_sub_verdadeira_1);
+    free_lista(lst_sub_verdadeira_2);
+    free_lista(lst_sub_falsa);
+    
+    printf("--- Teste 10: Copiar sem Duplicados ---\n");
+    Lista* l1 = cria_lista();
+    insere_lista_fim(l1, 10);
+    insere_lista_fim(l1, 20); // duplicado
+    insere_lista_fim(l1, 30);
+    insere_lista_fim(l1, 20); // duplicado
+
+    Lista* l2 = cria_lista(); // Cria a lista L2 vazia
+
+    printf("Lista 1 (Original): "); imprime_lista(l1);
+    printf("Lista 2 (Vazia): "); imprime_lista(l2);
+
+    // Chamamos a função (passando l1 (cel*) e l2 (cel**))
+    copiar_sem_duplicados(*l1, l2);
+
+    printf("Lista 2 (Apos copia): "); 
+    imprime_lista(l2); // Saida: 10 -> 20 -> 30 -> NULL
+
+    // Limpeza
+    free_lista(l1);
+    free_lista(l2);
 
     printf("\nTestes concluidos com sucesso.\n");
     
