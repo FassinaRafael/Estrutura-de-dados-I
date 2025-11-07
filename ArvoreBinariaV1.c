@@ -54,6 +54,31 @@ void posOrdem_ArvBin(ArvBin* raiz){
     }
 }
 
+int totalNos_ArvBin(ArvBin* raiz){
+    if(raiz == NULL || *raiz == NULL)
+        return 0;
+        
+    int total_esq = totalNos_ArvBin(&((*raiz)->esq));
+    int total_dir = totalNos_ArvBin(&((*raiz)->dir));
+    
+    return total_esq + total_dir + 1;
+}
+
+int altura_ArvBin(ArvBin* raiz){
+    if(raiz == NULL || *raiz == NULL)
+        return -1;
+        
+    int altura_esq = altura_ArvBin(&((*raiz)->esq));
+    int altura_dir = altura_ArvBin(&((*raiz)->dir));
+    
+    if(altura_esq > altura_dir){
+        return altura_esq + 1;
+    }
+    else {
+        return altura_dir + 1;
+    }
+}
+
 int main()
 {
     ArvBin* arvore = cria_ArvBin();
@@ -89,7 +114,18 @@ int main()
     printf("\nPós-ordem:");
     posOrdem_ArvBin(arvore);
 
-    printf("\n");
+    // NOVAS LINHAS: mostrar total de nós e altura
+    int total = totalNos_ArvBin(arvore);
+    int altura = altura_ArvBin(arvore);
+
+    printf("\n\nTotal de nós: %d", total);
+    printf("\nAltura da árvore: %d\n", altura);
+
+    // Libera memória
+    free(n2);
+    free(n3);
+    free(n1);
+    free(arvore);
 
     return 0;
 }
