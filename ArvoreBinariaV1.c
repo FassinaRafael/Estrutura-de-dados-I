@@ -79,6 +79,26 @@ int altura_ArvBin(ArvBin* raiz){
     }
 }
 
+int consulta_ArvBin(ArvBin* raiz, int valor){
+    if(raiz == NULL || *raiz == NULL)
+        return 0;
+
+    No* atual = *raiz;
+    while(atual != NULL){
+        
+        if(valor == atual->info){
+            return 1;
+        }
+        if(valor > atual->info){
+            atual = atual->dir;
+        }
+        else{
+            atual = atual->esq;
+        }
+    }
+    return 0;
+}
+
 int main()
 {
     ArvBin* arvore = cria_ArvBin();
