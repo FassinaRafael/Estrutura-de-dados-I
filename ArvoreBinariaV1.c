@@ -159,53 +159,115 @@ int insere_ArvBin(ArvBin *raiz, int valor) {
 	return 1;
 }
 
-int main()
-{
-	ArvBin* arvore = cria_ArvBin();
+No* remove_atual(No* atual) {
+	No *no1, *no2;
 
-	// Cria os nC3s manualmente
-	No* n1 = (No*) malloc(sizeof(No));
-	No* n2 = (No*) malloc(sizeof(No));
-	No* n3 = (No*) malloc(sizeof(No));
+	if(atual->esq == NULL) {
+		no2 = atual->dir;
+		free(atual);
+		return no2;
+	}
 
-	// Atribui valores
-	n1->info = 10;
-	n2->info = 5;
-	n3->info = 20;
+	no1 = atual;
+	no2 = atual->esq;
 
-	// Liga os nC3s
-	n1->esq = n2;
-	n1->dir = n3;
-	n2->esq = NULL;
-	n2->dir = NULL;
-	n3->esq = NULL;
-	n3->dir = NULL;
+	while(no2->dir != NULL) {
+		no1 = no2;
+		no2 = no2->dir;
+	}
 
-	// Define o nC3 raiz da C!rvore
-	*arvore = n1;
+	if(no1 != atual) {
+		no1->dir = no2->esq;
+		no2->esq = atual->esq;
+	}
 
-	// Testa as travessias
-	printf("Pre-ordem:");
-	preOrdem_ArvBin(arvore);
+	no2->dir = atual->dir;
+	free(atual);
+	return no2;
+}
 
-	printf("\nEm ordem:");
-	emOrdem_ArvBin(arvore);
+int remove_ArvBin(ArvBin* raiz, int valor) {
+    if (raiz == NULL || *raiz == NULL)
+        return 0;
 
-	printf("\nPos-ordem:");
-	posOrdem_ArvBin(arvore);
+    No *atual = *raiz;
+    No *anterior = NULL;
 
-	// NOVAS LINHAS: mostrar total de nC3s e altura
-	int total = totalNos_ArvBin(arvore);
-	int altura = altura_ArvBin(arvore);
+    while (atual != NULL) {
+        if (valor == atual->info) {
 
-	printf("\n\nTotal de nC3s: %d", total);
-	printf("\nAltura da C!rvore: %d\n", altura);
+            // caso seja a raiz
+            if (atual == *raiz) {
+                *raiz = remove_atual(atual);
+            }
+            else {
+                if (valor > anterior->info)
+                    anterior->dir = remove_atual(atual);
+                else
+                    anterior->esq = remove_atual(atual);
+            }
+            return 1; // Remoção bem-sucedida
+        }
 
-	// Libera memC3ria
-	free(n2);
-	free(n3);
-	free(n1);
-	free(arvore);
+        anterior = atual;
 
-	return 0;
+        if (valor > atual->info)
+            atual = atual->dir;
+        else
+            atual = atual->esq;
+    }
+
+    return 0; // valor não encontrado
+}
+
+
+int main() {
+    ArvBin* arvore = cria_ArvBin();
+
+    printf("---- TESTE DE INSERÇÃO ----\n");
+    insere_ArvBin(arvore, 10);
+    insere_ArvBin(arvore, 5);
+    insere_ArvBin(arvore, 20);
+    insere_ArvBin(arvore, 3);
+    insere_ArvBin(arvore, 7);
+    insere_ArvBin(arvore, 15);
+    insere_ArvBin(arvore, 30);
+
+    printf("\nPré-ordem:   ");
+    preOrdem_ArvBin(arvore);
+
+    printf("\nEm ordem:    ");
+    emOrdem_ArvBin(arvore);
+
+    printf("\nPós-ordem:   ");
+    posOrdem_ArvBin(arvore);
+
+    printf("\n\nTotal de nós: %d", totalNos_ArvBin(arvore));
+    printf("\nAltura: %d\n", altura_ArvBin(arvore));
+
+    printf("\n---- TESTE DE CONSULTA ----\n");
+    printf("Consulta 7  -> %s\n", consulta_ArvBin(arvore, 7) ? "Encontrado" : "Não encontrado");
+    printf("Consulta 99 -> %s\n", consulta_ArvBin(arvore, 99) ? "Encontrado" : "Não encontrado");
+
+    printf("\n---- TESTE DE REMOÇÃO ----\n");
+
+    printf("\nRemovendo 3 (folha)\n");
+    remove_ArvBin(arvore, 3);
+    emOrdem_ArvBin(arvore);
+
+    printf("\n\nRemovendo 20 (tem 1 filho)\n");
+    remove_ArvBin(arvore, 20);
+    emOrdem_ArvBin(arvore);
+
+    printf("\n\nRemovendo 10 (raiz)\n");
+    remove_ArvBin(arvore, 10);
+    emOrdem_ArvBin(arvore);
+
+    printf("\n\nNovo total de nós: %d", totalNos_ArvBin(arvore));
+    printf("\nNova altura: %d\n", altura_ArvBin(arvore));
+
+    printf("\n---- LIBERANDO ÁRVORE ----\n");
+    libera_ArvBin(arvore);
+
+    return 0;
 }
